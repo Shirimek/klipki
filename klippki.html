@@ -214,23 +214,6 @@ src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/so
 </div>`;
     const fbWrap = document.getElementById('fbWrap');
     fbWrap.innerHTML = `<iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fphoto%2F%3Ffbid%3D1200323308567178%26set%3Da.100786108520909&show_text=true&width=600" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>`;
-    
-    // --- NOWE: 10 kart YouTube po spacji ---
-    const cardContainer = document.createElement('div');
-    cardContainer.style.display='grid';
-    cardContainer.style.gridTemplateColumns='repeat(5,1fr)';
-    cardContainer.style.gap='8px';
-    cardContainer.style.marginTop='20px';
-    for(let i=0;i<10;i++){
-      const iframe = document.createElement('iframe');
-      iframe.src = `https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0`; // tu możesz wstawić własne linki
-      iframe.width='160';
-      iframe.height='90';
-      iframe.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-      cardContainer.appendChild(iframe);
-    }
-    scWrap.appendChild(cardContainer);
-
     setTimeout(()=>{
       fbWrap.style.transform = 'translate(-50%, -50%) scale(1) rotate(0deg)';
       fbWrap.style.opacity = 1;
@@ -242,12 +225,11 @@ src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/so
         if(pulseCount >= 4) clearInterval(pulseInterval);
       }, 400);
     }, 300);
-    document.getElementById('message').textContent = "Konfetti + muzyka + obrazek + 10 kart YouTube! 🎉";
+    document.getElementById('message').textContent = "Konfetti + muzyka + obrazek! 🎉";
   }
 });
 
 // --- CAPTCHA ---
-// reszta Twojego CAPTCHA skryptu bez zmian...
 (function(){
   const overlay = document.getElementById('captchaOverlay');
   const input = document.getElementById('captchaInput');
@@ -300,13 +282,96 @@ src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/so
 
   function blockWhileCaptcha(e){ if(!overlay||overlay.style.display==='none') return; if(e.target && overlay.contains(e.target)) return; e.stopPropagation(); e.preventDefault(); }
 
-  verifyBtn.addEventListener('click', ()=>{ const val=parseInt(input.value.trim(),10); if(!Number.isFinite(val)){ err.textContent='To musi być liczba.'; return; } if(val===correctAnswer){ humanSection.style.display='flex'; humanCheckbox.checked=false; humanCheckbox.focus(); err.textContent='Kliknij checkbox żeby potwierdzić.'; } else { err.textContent='Źle — spróbuj jeszcze raz.'; attempts++; if(attempts>=3){ attempts=0; genQuestion(); err.textContent='Dajemy nowe zadanie.'; } } });
+  verifyBtn.addEventListener('click', ()=>{
+    const val=parseInt(input.value.trim(),10);
+    if(!Number.isFinite(val)){ err.textContent='To musi być liczba.'; return; }
+    if(val===correctAnswer){ showHumanCheckbox(); } else { err.textContent='Źle — spróbuj jeszcze raz.'; attempts++; if(attempts>=3){ attempts=0; genQuestion(); err.textContent='Dajemy nowe zadanie.'; } }
+  });
   refreshBtn.addEventListener('click', ()=>{ attempts=0; genQuestion(); });
   hintBtn.addEventListener('click', ()=>{ err.textContent='Podpowiedź: wynik to ' + correctAnswer; setTimeout(()=> err.textContent='',2500); });
   input.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); verifyBtn.click(); } });
+
+  function showHumanCheckbox(){ qEl.style.display='none'; input.style.display='none'; document.getElementById('captchaControls').style.display='none'; humanSection.style.display='flex'; humanSection.setAttribute('aria-hidden','false'); humanCheckbox.focus(); err.textContent='Kliknij checkbox żeby potwierdzić.'; }
+  humanCheckbox.addEventListener('change',function(){ if(humanCheckbox.checked){ showBalloonGame(); } });
+
+  // --- BALLOONS ---
+  let popped=0, TOTAL_BALLOONS=10;
+  function randomBetween(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+  function createBalloon(id){
+    const b=document.createElement('div'); b.className='balloon'; b.dataset.id=id;
+    const colors=['#ff6b81','#ffd166','#6ee7b7','#7ad0ff','#ff4757','#c084fc']; b.style.background=colors[Math.floor(Math.random()*colors.length)];
+    const pw=balloonGame.clientWidth-60; const ph=balloonGame.clientHeight-80;
+    const left=randomBetween(8, Math.max(8,pw)); const top=randomBetween(8, Math.max(8,ph));
+    b.style.left=left+'px'; b.style.top=top+'px'; b.style.zIndex=50+id;
+    b.addEventListener('click',function popHandler(){ b.style.transition='transform 0.15s ease, opacity 0.15s ease'; b.style.transform='scale(0.2) translateY(-10px)'; b.style.opacity='0'; setTimeout(()=>{ if(b.parentNode) b.parentNode.removeChild(b); },160); popped++; balloonCountEl.textContent=String(popped); setTimeout(()=>{ generateBalloonsUntil(TOTAL_BALLOONS); },250); if(popped>=TOTAL_BALLOONS){ setTimeout(()=>{ showMinecraftQuiz(); },200); } },{once:true}); return b; }
+  function generateBalloonsUntil(n){ const existing=balloonGame.querySelectorAll('.balloon').length; const toCreate=Math.min(n-existing, Math.max(0,TOTAL_BALLOONS-popped-existing)); for(let i=0;i<toCreate;i++){ const id=Date.now()+Math.random()*10000+i; const bal=createBalloon(id); balloonGame.appendChild(bal); } if(balloonGame.querySelectorAll('.balloon').length===0 && popped<TOTAL_BALLOONS){ setTimeout(()=>generateBalloonsUntil(n),300); } }
+  function showBalloonGame(){ humanSection.style.display='none'; balloonGame.style.display='block'; balloonGame.setAttribute('aria-hidden','false'); balloonCounterWrap.style.display='block'; balloonCountEl.textContent='0'; popped=0; generateBalloonsUntil(TOTAL_BALLOONS); }
+
+  /* MINECRAFT QUIZ */
+  function showMinecraftQuiz(){ balloonGame.style.display='none'; balloonGame.setAttribute('aria-hidden','true'); balloonCounterWrap.style.display='none'; minecraftQuiz.style.display='block'; minecraftError.textContent=''; }
+  minecraftVerify.addEventListener('click',function(){
+    const sel = document.querySelector('input[name="minecraftAnswer"]:checked');
+    if(!sel){ minecraftError.textContent='Wybierz odpowiedź.'; return; }
+    if(sel.value==='wood'||sel.value==='wool'){ minecraftError.textContent=''; showTimeQuiz(); } else { minecraftError.textContent='Źle, spróbuj jeszcze raz.'; }
+  });
+
+  /* TIME QUIZ */
+  function showTimeQuiz(){ minecraftQuiz.style.display='none'; timeQuiz.style.display='block'; timeError.textContent=''; timeInput.value=''; timeInput.focus(); }
+  timeVerify.addEventListener('click',function(){ const val=parseInt(timeInput.value,10); if(val===86400){ showCs2Quiz(); } else { timeError.textContent='Źle, spróbuj jeszcze raz.'; } });
+
+  /* CS2 QUIZ */
+  function showCs2Quiz(){ timeQuiz.style.display='none'; cs2Quiz.style.display='block'; cs2Input.focus(); }
+  cs2Verify.addEventListener('click',function(){ const val=cs2Input.value.trim().toLowerCase(); if(val==='jadlopodawca'){ cs2Quiz.style.display='none'; showSzamanQuiz(); } else { cs2Error.textContent='Źle, spróbuj jeszcze raz.'; } });
+
+  /* SZAMAN QUIZ */
+  function showSzamanQuiz(){ szamanQuiz.style.display='block'; szamanInput.focus(); }
+  szamanVerify.addEventListener('click', function(){
+  const val = szamanInput.value.trim().toLowerCase();
+  
+  if(val === 'wazon'){ 
+    alert('To nie jest pytanie o najgorszego gracza cs2 i suchoklatesa, za kare wracasz do 1 pytania');
+    
+    // ukryj wszystkie quizy
+    szamanQuiz.style.display = 'none';
+    cs2Quiz.style.display = 'none';
+    minecraftQuiz.style.display = 'none';
+    timeQuiz.style.display = 'none';
+    
+    // pokaż tylko pierwsze pytanie matematyczne
+    const input = document.getElementById('captchaInput');
+    const qEl = document.getElementById('captchaQuestion');
+    const err = document.getElementById('captchaError');
+    input.style.display = 'block';
+    qEl.style.display = 'block';
+    document.getElementById('captchaControls').style.display = 'flex';
+    err.textContent = '';
+    input.value = '';
+    input.focus();
+
+    // zresetuj human checkbox i balony
+    document.getElementById('humanCheckSection').style.display = 'none';
+    document.getElementById('balloonGame').style.display = 'none';
+    document.getElementById('balloonCounter').style.display = 'none';
+
+    // wygeneruj nowe matematyczne pytanie
+    const correctAnswer = Math.floor(Math.random()*9+1) + Math.floor(Math.random()*9+1); // prosta wersja, możesz dopasować jak w genQuestion()
+    qEl.textContent = `Ile to jest ${Math.floor(Math.random()*9+1)} + ${Math.floor(Math.random()*9+1)} ?`;
+  }
+  else if(val === 'szaman'){ 
+    szamanQuiz.style.display='none'; 
+    finishCaptcha(); 
+  } 
+  else { 
+    szamanError.textContent='Źle, spróbuj jeszcze raz.'; 
+  }
+});
+
+
+  function finishCaptcha(){ hideOverlay(); }
 
   document.addEventListener('DOMContentLoaded',function(){ setTimeout(showOverlay,80); });
 })();
 </script>
 </body>
 </html>
+
