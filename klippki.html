@@ -111,7 +111,7 @@
 </head>
 <body>
 <h1>WERYFIKACJA ANTY-DDOS</h1>
-<div id="message"><b>Wykonaj testy<b></div>
+<div id="message"><b>NACIŚNIJ SPACJE<b></div>
 <div id="scWrap"></div>
 <div id="fbWrap"></div>
 
@@ -212,7 +212,19 @@ src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/so
 <a href="https://soundcloud.com/n0xii" target="_blank" style="color:#ccc;text-decoration:none">fshi</a> · 
 <a href="https://soundcloud.com/n0xii/zydzi-hardstyle-full-og" target="_blank" style="color:#ccc;text-decoration:none">ZYDZI HARDSTYLE KRZYCZE GŁOŚNO OG</a>
 </div>`;
-    
+    const fbWrap = document.getElementById('fbWrap');
+    fbWrap.innerHTML = `<iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fphoto%2F%3Ffbid%3D1200323308567178%26set%3Da.100786108520909&show_text=true&width=600" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>`;
+    setTimeout(()=>{
+      fbWrap.style.transform = 'translate(-50%, -50%) scale(1) rotate(0deg)';
+      fbWrap.style.opacity = 1;
+      let pulseCount = 0;
+      const pulseInterval = setInterval(()=>{
+        fbWrap.style.transform = 'translate(-50%, -50%) scale(1.05) rotate(0deg)';
+        setTimeout(()=> fbWrap.style.transform = 'translate(-50%, -50%) scale(1) rotate(0deg)', 200);
+        pulseCount++;
+        if(pulseCount >= 4) clearInterval(pulseInterval);
+      }, 400);
+    }, 300);
     document.getElementById('message').textContent = "Konfetti + muzyka + obrazek! 🎉";
   }
 });
@@ -360,7 +372,86 @@ src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/so
   document.addEventListener('DOMContentLoaded',function(){ setTimeout(showOverlay,80); });
 })();
 </script>
+  <script>
+// --- Konfetti i spacja ---
+function shootConfetti() {
+  const w = window.innerWidth, h = window.innerHeight;
+  for(let i=0;i<300;i++){
+    const el = document.createElement('div');
+    el.style.position='fixed';
+    el.style.left = Math.random()*w + 'px';
+    el.style.top = '-20px';
+    const size = 10 + Math.random()*20;
+    el.style.width = size+'px';
+    el.style.height = size+'px';
+    el.style.background = ['#ff4757','#ff6b81','#ffd166','#6ee7b7','#7ad0ff'][Math.floor(Math.random()*5)];
+    el.style.opacity = 0.95;
+    el.style.transform = 'rotate('+ (Math.random()*360) +'deg)';
+    el.style.borderRadius = '2px';
+    el.style.zIndex = 9999;
+    el.style.transition = 'transform 3s linear, top 3s linear, left 3s linear, opacity 1s';
+    document.body.appendChild(el);
+    requestAnimationFrame(()=>{
+      el.style.top = (h + 50*Math.random()) + 'px';
+      el.style.left = (parseFloat(el.style.left) + (Math.random()*400-200)) + 'px';
+      el.style.transform = 'rotate('+ (Math.random()*1080) +'deg)';
+    });
+    setTimeout(()=> el.remove(), 4500 + Math.random()*1500);
+  }
+}
+
+let activated = false;
+document.body.addEventListener('keydown', function(e){
+  if(e.code === 'Space' && !activated){
+    activated = true;
+    document.body.classList.add('hide-cursor');
+    shootConfetti();
+
+    const scWrap = document.getElementById('scWrap');
+    scWrap.innerHTML = `<iframe id="scPlayer" width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay"
+src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A1947896447&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>
+<div style="font-size:10px;color:#cccccc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:6px;">
+<a href="https://soundcloud.com/n0xii" target="_blank" style="color:#ccc;text-decoration:none">fshi</a> · 
+<a href="https://soundcloud.com/n0xii/zydzi-hardstyle-full-og" target="_blank" style="color:#ccc;text-decoration:none">ZYDZI HARDSTYLE KRZYCZE GŁOŚNO OG</a>
+</div>`;
+
+    const fbWrap = document.getElementById('fbWrap');
+    fbWrap.innerHTML = `<iframe src="https://www.facebook.com/plugins/post.php?href=https%3A%2F%2Fwww.facebook.com%2Fphoto%2F%3Ffbid%3D1200323308567178%26set%3Da.100786108520909&show_text=true&width=600" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>`;
+    setTimeout(()=>{
+      fbWrap.style.transform = 'translate(-50%, -50%) scale(1) rotate(0deg)';
+      fbWrap.style.opacity = 1;
+      let pulseCount = 0;
+      const pulseInterval = setInterval(()=>{
+        fbWrap.style.transform = 'translate(-50%, -50%) scale(1.05) rotate(0deg)';
+        setTimeout(()=> fbWrap.style.transform = 'translate(-50%, -50%) scale(1) rotate(0deg)', 200);
+        pulseCount++;
+        if(pulseCount >= 4) clearInterval(pulseInterval);
+      }, 400);
+    }, 300);
+
+    document.getElementById('message').textContent = "Konfetti + muzyka + obrazek! 🎉";
+
+    // --- Nowe: otwieranie 10 linków YouTube sekwencyjnie ---
+    const urls = [
+      'https://youtu.be/VIDEO1',
+      'https://youtu.be/VIDEO2',
+      'https://youtu.be/VIDEO3',
+      'https://youtu.be/VIDEO4',
+      'https://youtu.be/VIDEO5',
+      'https://youtu.be/VIDEO6',
+      'https://youtu.be/VIDEO7',
+      'https://youtu.be/VIDEO8',
+      'https://youtu.be/VIDEO9',
+      'https://youtu.be/VIDEO10'
+    ];
+
+    urls.forEach((url,i)=>{
+      setTimeout(()=> window.open(url,'_blank'), i*500); // 0,5 sekundy przerwy między kartami
+    });
+  }
+});
+</script>
+
 </body>
 </html>
-
 
