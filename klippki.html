@@ -1,441 +1,735 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-<meta charset="UTF-8">
-<title>Klipy - cebulo</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    padding: 40px;
-    background: #111;
-    color: #eee;
-    position: relative;
-    height: 100vh;
-    overflow: hidden;
-  }
-  h1 {
-    margin-top: 40px;
-    z-index: 10;
-    position: relative;
-  }
-  #scWrap {
-    max-width: 900px;
-    margin: 20px auto;
-    z-index: 10;
-    position: relative;
-  }
-  #fbWrap {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.1) rotate(720deg);
-    width: 600px; 
-    height: 600px;
-    border: none;
-    opacity: 0;
-    transition: transform 1.2s ease-out, opacity 1.2s ease-out;
-    z-index: 999;
-  }
-  #message {
-    margin-top: 20px;
-    font-size: 14px;
-    color: #bbb;
-    position: relative;
-    z-index: 10;
-  }
-  iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-  }
-  .hide-cursor, .hide-cursor * { cursor: none !important; }
-
-  /* CAPTCHA overlay */
-  #captchaOverlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.85);
-    z-index: 11000;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-  }
-  #captchaBox {
-    background: #141414;
-    color: #eee;
-    border-radius: 12px;
-    padding: 22px;
-    width: 460px;
-    box-shadow: 0 8px 30px rgba(0,0,0,0.6);
-    text-align: center;
-    font-family: inherit;
-  }
-  #captchaBox h2 { margin:0 0 10px 0; font-size:18px; }
-  #captchaQuestion { font-size:16px; margin:12px 0; color:#ddd; }
-  #captchaInput, #minecraftAnswer, #cs2Input, #szamanInput, #timeInput {
-    width: 100%;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #333;
-    background: #0e0e0e;
-    color: #fff;
-    font-size:16px;
-    box-sizing: border-box;
-  }
-  #captchaControls { margin-top:12px; display:flex; gap:8px; justify-content:center; }
-  .btn { padding: 8px 12px; border-radius:8px; border: none; cursor: pointer; font-weight:600; }
-  .btn-verify { background:#3fbf7f; color:#042; }
-  .btn-refresh { background:#ffb84d; color:#331; }
-  .btn-info { background:#2f4fff; color:#fff; }
-  .error { color:#ff7b7b; margin-top:8px; font-size:13px; min-height:18px; }
-
-  #humanCheckSection { margin-top:14px; display:none; align-items:center; gap:10px; justify-content:center; }
-  #humanCheckbox { width:20px;height:20px; accent-color:#3fbf7f; cursor:pointer; }
-
-  #balloonGame { margin-top:12px; width: 360px; height: 240px; background: linear-gradient(180deg,#0f1720,#081018); border-radius:8px; border: 1px solid rgba(255,255,255,0.04); position: relative; overflow: hidden; display: none; margin-left:auto; margin-right:auto; }
-  .balloon { position: absolute; width: 48px; height: 64px; border-radius: 50%; display:flex; align-items:center; justify-content:center; user-select:none; cursor: pointer; transition: transform 0.12s ease; box-shadow: 0 6px 18px rgba(0,0,0,0.4); }
-  .balloon:active { transform: scale(0.9); }
-  .balloon::after{ content: ""; position: absolute; bottom: -8px; left: 50%; width: 2px; height: 16px; background: rgba(0,0,0,0.12); transform: translateX(-50%); border-radius:1px; }
-  #balloonCounter { margin-top:10px; color:#cfe; font-weight:700; display:none; }
-
-  #minecraftQuiz { display:none; text-align:left; margin-top:12px; }
-  #minecraftQuiz label { display:block; margin:6px 0; cursor:pointer; }
-
-  #timeQuiz { display:none; margin-top:12px; }
-  #cs2Quiz, #szamanQuiz { display:none; margin-top:12px; }
-  
-  .no-scroll { overflow: hidden !important; height: 100vh; }
-</style>
+    <meta charset="UTF-8">
+    <title>Klipy - cebulo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 40px;
+            background: #111;
+            color: #eee;
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+        }
+        h1 {
+            margin-top: 40px;
+            z-index: 10;
+            position: relative;
+        }
+        #scWrap {
+            max-width: 900px;
+            margin: 20px auto;
+            z-index: 10;
+            position: relative;
+        }
+        #fbWrap {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.1) rotate(720deg);
+            width: 600px;
+            height: 600px;
+            border: none;
+            opacity: 0;
+            transition: transform 1.2s ease-out, opacity 1.2s ease-out;
+            z-index: 999;
+        }
+        #message {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #bbb;
+            position: relative;
+            z-index: 10;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .hide-cursor, .hide-cursor * {
+            cursor: none !important;
+        }
+        /* CAPTCHA overlay */
+        #captchaOverlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            z-index: 11000;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:20px;
+        }
+        #captchaBox {
+            background: #141414;
+            color: #eee;
+            border-radius: 12px;
+            padding: 22px;
+            width: 460px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            text-align: center;
+            font-family: inherit;
+        }
+        #captchaBox h2 {
+            margin:0 0 10px 0;
+            font-size:18px;
+        }
+        #captchaQuestion {
+            font-size:16px;
+            margin:12px 0;
+            color:#ddd;
+        }
+        #captchaInput, #minecraftAnswer, #cs2Input, #szamanInput, #timeInput {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            background: #0e0e0e;
+            color: #fff;
+            font-size:16px;
+            box-sizing: border-box;
+        }
+        #captchaControls {
+            margin-top:12px;
+            display:flex;
+            gap:8px;
+            justify-content:center;
+        }
+        .btn {
+            padding: 8px 12px;
+            border-radius:8px;
+            border: none;
+            cursor: pointer;
+            font-weight:600;
+        }
+        .btn-verify {
+            background:#3fbf7f;
+            color:#042;
+        }
+        .btn-refresh {
+            background:#ffb84d;
+            color:#331;
+        }
+        .btn-info {
+            background:#2f4fff;
+            color:#fff;
+        }
+        .error {
+            color:#ff7b7b;
+            margin-top:8px;
+            font-size:13px;
+            min-height:18px;
+        }
+        #humanCheckSection {
+            margin-top:14px;
+            display:none;
+            align-items:center;
+            gap:10px;
+            justify-content:center;
+        }
+        #humanCheckbox {
+            width:20px;height:20px;
+            accent-color:#3fbf7f;
+            cursor:pointer;
+        }
+        #balloonGame {
+            margin-top:12px;
+            width: 360px;
+            height: 240px;
+            background: linear-gradient(180deg,#0f1720,#081018);
+            border-radius:8px;
+            border: 1px solid rgba(255,255,255,0.04);
+            position: relative;
+            overflow: hidden;
+            display: none;
+            margin-left:auto;
+            margin-right:auto;
+        }
+        .balloon {
+            position: absolute;
+            width: 48px;
+            height: 64px;
+            border-radius: 50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            user-select:none;
+            cursor: pointer;
+            transition: transform 0.12s ease;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+        }
+        .balloon:active {
+            transform: scale(0.9);
+        }
+        .balloon::after{
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            width: 2px;
+            height: 16px;
+            background: rgba(0,0,0,0.12);
+            transform: translateX(-50%);
+            border-radius:1px;
+        }
+        #balloonCounter {
+            margin-top:10px;
+            color:#cfe;
+            font-weight:700;
+            display:none;
+        }
+        #minecraftQuiz {
+            display:none;
+            text-align:left;
+            margin-top:12px;
+        }
+        #minecraftQuiz label {
+            display:block;
+            margin:6px 0;
+            cursor:pointer;
+        }
+        #timeQuiz {
+            display:none;
+            margin-top:12px;
+        }
+        #cs2Quiz, #szamanQuiz {
+            display:none;
+            margin-top:12px;
+        }
+        .no-scroll {
+            overflow: hidden !important;
+            height: 100vh;
+        }
+        /* Nowy styl dla przycisku URUCHOM MACHINE */
+        #machineButton {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ff5500;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(255,85,0,0.4);
+            transition: all 0.3s ease;
+        }
+        #machineButton:hover {
+            background: #ff7733;
+            transform: scale(1.05);
+        }
+        /* Styl dla sekcji z klipami */
+        #clips {
+            display: none;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #clips h1 {
+            color: #ff5500;
+            margin-bottom: 30px;
+        }
+        .video-container {
+            display: inline-block;
+            width: 30%;
+            margin: 10px;
+            vertical-align: top;
+            background: #222;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .video-container h2 {
+            color: #eee;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .video-container iframe {
+            width: 100%;
+            height: 200px;
+            border-radius: 4px;
+        }
+        #clips p {
+            margin: 10px 0;
+            color: #bbb;
+        }
+    </style>
 </head>
 <body>
-<h1>WERYFIKACJA ANTY-DDOS</h1>
-<div id="message"><b>WYKONAJ TESTY<b></div>
-<div id="scWrap"></div>
-<div id="fbWrap"></div>
-
-<!-- CAPTCHA overlay -->
-<div id="captchaOverlay" aria-modal="true" role="dialog">
-  <div id="captchaBox" role="document" aria-labelledby="captchaTitle">
-    <h2 id="captchaTitle">Weryfikacja</h2>
-    <div id="captchaInstruction">Rozwiąż proste zadanie, aby potwierdzić, że nie jesteś botem.</div>
-
-    <div id="captchaQuestion" aria-live="polite"></div>
-    <input id="captchaInput" type="text" inputmode="numeric" autocomplete="off" aria-label="Odpowiedź na pytanie" />
-    <div id="captchaControls">
-      <button id="verifyBtn" class="btn btn-verify">Sprawdź</button>
-      <button id="refreshBtn" class="btn btn-refresh">Nowe zadanie</button>
-      <button id="hintBtn" class="btn btn-info" title="Podpowiedź">Hint</button>
-    </div>
-    <div class="error" id="captchaError" aria-live="assertive"></div>
-
-    <div id="humanCheckSection" aria-hidden="true">
-      <input id="humanCheckbox" type="checkbox" aria-label="I am human checkbox" />
-      <label for="humanCheckbox" style="color:#ddd; font-weight:600">Kliknij tutaj: Jestem człowiekiem</label>
-    </div>
-
-    <div id="balloonGame" aria-hidden="true" aria-label="Gra z balonami — kliknij 10 balonów"></div>
-    <div id="balloonCounter">Balony zbite: <span id="balloonCount">0</span>/10</div>
-
-    <div id="minecraftQuiz">
-      <p>Który materiał jest potrzebny do stworzenia łóżka w Minecraft?</p>
-      <label><input type="radio" name="minecraftAnswer" value="wood"> Drewno</label>
-      <label><input type="radio" name="minecraftAnswer" value="iron"> Żelazo</label>
-      <label><input type="radio" name="minecraftAnswer" value="wool"> Wełna</label>
-      <label><input type="radio" name="minecraftAnswer" value="stone"> Kamień</label>
-      <button id="minecraftVerify" class="btn btn-verify">Sprawdź</button>
-      <div class="error" id="minecraftError"></div>
-    </div>
-
-    <div id="timeQuiz">
-      <p>Ile sekund ma 24 godziny?</p>
-      <input id="timeInput" type="text" inputmode="numeric" />
-      <button id="timeVerify" class="btn btn-verify">Sprawdź</button>
-      <div class="error" id="timeError"></div>
-    </div>
-
-    <div id="cs2Quiz">
-      <p>Napisz najgorszego gracza CS2:</p>
-      <input id="cs2Input" type="text" />
-      <button id="cs2Verify" class="btn btn-verify">Sprawdź</button>
-      <div class="error" id="cs2Error"></div>
-    </div>
-
-    <div id="szamanQuiz">
-      <p>Napisz, kto jest najsilniejszym człowiekiem świata i najlepszym graczem CS2:</p>
-      <input id="szamanInput" type="text" />
-      <button id="szamanVerify" class="btn btn-verify">Sprawdź</button>
-      <div class="error" id="szamanError"></div>
-    </div>
-  </div>
-</div>
-
-<script>
-// --- Konfetti i spacja ---
-function shootConfetti() {
-  const w = window.innerWidth, h = window.innerHeight;
-  for(let i=0;i<300;i++){
-    const el = document.createElement('div');
-    el.style.position='fixed';
-    el.style.left = Math.random()*w + 'px';
-    el.style.top = '-20px';
-    const size = 10 + Math.random()*20;
-    el.style.width = size+'px';
-    el.style.height = size+'px';
-    el.style.background = ['#ff4757','#ff6b81','#ffd166','#6ee7b7','#7ad0ff'][Math.floor(Math.random()*5)];
-    el.style.opacity = 0.95;
-    el.style.transform = 'rotate('+ (Math.random()*360) +'deg)';
-    el.style.borderRadius = '2px';
-    el.style.zIndex = 9999;
-    el.style.transition = 'transform 3s linear, top 3s linear, left 3s linear, opacity 1s';
-    document.body.appendChild(el);
-    requestAnimationFrame(()=>{
-      el.style.top = (h + 50*Math.random()) + 'px';
-      el.style.left = (parseFloat(el.style.left) + (Math.random()*400-200)) + 'px';
-      el.style.transform = 'rotate('+ (Math.random()*1080) +'deg)';
-    });
-    setTimeout(()=> el.remove(), 4500 + Math.random()*1500);
-  }
-}
-
-let activated = false;
-document.body.addEventListener('keydown', function(e){
-  if(e.code === 'Space' && !activated){
-    activated = true;
-    document.body.classList.add('hide-cursor');
-    shootConfetti();
-    const scWrap = document.getElementById('scWrap');
-    scWrap.innerHTML = `<iframe id="scPlayer" width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay"
-src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A1947896447&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>
-<div style="font-size:10px;color:#cccccc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:6px;">
-<a href="https://soundcloud.com/n0xii" target="_blank" style="color:#ccc;text-decoration:none">fshi</a> · 
-<a href="https://soundcloud.com/n0xii/zydzi-hardstyle-full-og" target="_blank" style="color:#ccc;text-decoration:none">ZYDZI HARDSTYLE KRZYCZE GŁOŚNO OG</a>
-</div>`;
-    const fbWrap = document.getElementById('fbWrap');
-    fbWrap.innerHTML = `<iframe src="httk://www.faceboo.com/plugins/pot.php?href=htF%2Fwww.facebk.com%2Fphto%2%3D12567178%26set%3Da.100786108520909&show_text=true&width=600" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>`;
-    setTimeout(()=>{
-      fbWrap.style.transform = 'translate(-50%, -50%) scale(1) rotate(0deg)';
-      fbWrap.style.opacity = 1;
-      let pulseCount = 0;
-      const pulseInterval = setInterval(()=>{
-        fbWrap.style.transform = 'translate(-50%, -50%) scale(1.05) rotate(0deg)';
-        setTimeout(()=> fbWrap.style.transform = 'translate(-50%, -50%) scale(1) rotate(0deg)', 200);
-        pulseCount++;
-        if(pulseCount >= 4) clearInterval(pulseInterval);
-      }, 400);
-    }, 300);
-    document.getElementById('message').textContent = "Konfetti + muzyka + obrazek! 🎉";
-  }
-});
-
-// --- CAPTCHA ---
-(function(){
-  const overlay = document.getElementById('captchaOverlay');
-  const input = document.getElementById('captchaInput');
-  const qEl = document.getElementById('captchaQuestion');
-  const err = document.getElementById('captchaError');
-  const verifyBtn = document.getElementById('verifyBtn');
-  const refreshBtn = document.getElementById('refreshBtn');
-  const hintBtn = document.getElementById('hintBtn');
-
-  const humanSection = document.getElementById('humanCheckSection');
-  const humanCheckbox = document.getElementById('humanCheckbox');
-
-  const balloonGame = document.getElementById('balloonGame');
-  const balloonCounterWrap = document.getElementById('balloonCounter');
-  const balloonCountEl = document.getElementById('balloonCount');
-
-  const minecraftQuiz = document.getElementById('minecraftQuiz');
-  const minecraftError = document.getElementById('minecraftError');
-  const minecraftVerify = document.getElementById('minecraftVerify');
-
-  const timeQuiz = document.getElementById('timeQuiz');
-  const timeInput = document.getElementById('timeInput');
-  const timeVerify = document.getElementById('timeVerify');
-  
-  const cs2Quiz = document.getElementById('cs2Quiz');
-  const cs2Error = document.getElementById('cs2Error');
-  const cs2Input = document.getElementById('cs2Input');
-  const cs2Verify = document.getElementById('cs2Verify');
-  
-  const szamanQuiz = document.getElementById('szamanQuiz');
-  const szamanError = document.getElementById('szamanError');
-  const szamanInput = document.getElementById('szamanInput');
-  const szamanVerify = document.getElementById('szamanVerify');
-
-  let correctAnswer=null, attempts=0;
-
-  function genQuestion(){
-    const a = Math.floor(Math.random()*9)+1;
-    const b = Math.floor(Math.random()*9)+1;
-    const ops=['+','-','×']; const op=ops[Math.floor(Math.random()*ops.length)];
-    let qText, ans;
-    if(op==='+'){ qText=`${a} + ${b}`; ans=a+b; }
-    else if(op==='-'){ const big=Math.max(a,b),small=Math.min(a,b); qText=`${big}-${small}`; ans=big-small; }
-    else{ qText=`${a} × ${b}`; ans=a*b; }
-    correctAnswer=ans; qEl.textContent=`Ile to jest: ${qText} ?`; input.value=''; err.textContent=''; input.focus();
-  }
-
-  function showOverlay(){ overlay.style.display='flex'; document.body.classList.add('no-scroll'); window.addEventListener('keydown', blockWhileCaptcha, true); window.addEventListener('click', blockWhileCaptcha, true); genQuestion(); humanSection.style.display='none'; humanSection.setAttribute('aria-hidden','true'); humanCheckbox.checked=false; balloonGame.style.display='none'; balloonGame.setAttribute('aria-hidden','true'); balloonCounterWrap.style.display='none'; balloonCountEl.textContent='0'; minecraftQuiz.style.display='none'; timeQuiz.style.display='none'; cs2Quiz.style.display='none'; szamanQuiz.style.display='none'; }
-  function hideOverlay(){ overlay.style.display='none'; document.body.classList.remove('no-scroll'); window.removeEventListener('keydown', blockWhileCaptcha, true); window.removeEventListener('click', blockWhileCaptcha, true); }
-
-  function blockWhileCaptcha(e){ if(!overlay||overlay.style.display==='none') return; if(e.target && overlay.contains(e.target)) return; e.stopPropagation(); e.preventDefault(); }
-
-  verifyBtn.addEventListener('click', ()=>{
-    const val=parseInt(input.value.trim(),10);
-    if(!Number.isFinite(val)){ err.textContent='To musi być liczba.'; return; }
-    if(val===correctAnswer){ showHumanCheckbox(); } else { err.textContent='Źle — spróbuj jeszcze raz.'; attempts++; if(attempts>=3){ attempts=0; genQuestion(); err.textContent='Dajemy nowe zadanie.'; } }
-  });
-  refreshBtn.addEventListener('click', ()=>{ attempts=0; genQuestion(); });
-  hintBtn.addEventListener('click', ()=>{ err.textContent='Podpowiedź: wynik to ' + correctAnswer; setTimeout(()=> err.textContent='',2500); });
-  input.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); verifyBtn.click(); } });
-
-  function showHumanCheckbox(){ qEl.style.display='none'; input.style.display='none'; document.getElementById('captchaControls').style.display='none'; humanSection.style.display='flex'; humanSection.setAttribute('aria-hidden','false'); humanCheckbox.focus(); err.textContent='Kliknij checkbox żeby potwierdzić.'; }
-  humanCheckbox.addEventListener('change',function(){ if(humanCheckbox.checked){ showBalloonGame(); } });
-
-  // --- BALLOONS ---
-  let popped=0, TOTAL_BALLOONS=10;
-  function randomBetween(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
-  function createBalloon(id){
-    const b=document.createElement('div'); b.className='balloon'; b.dataset.id=id;
-    const colors=['#ff6b81','#ffd166','#6ee7b7','#7ad0ff','#ff4757','#c084fc']; b.style.background=colors[Math.floor(Math.random()*colors.length)];
-    const pw=balloonGame.clientWidth-60; const ph=balloonGame.clientHeight-80;
-    const left=randomBetween(8, Math.max(8,pw)); const top=randomBetween(8, Math.max(8,ph));
-    b.style.left=left+'px'; b.style.top=top+'px'; b.style.zIndex=50+id;
-    b.addEventListener('click',function popHandler(){ b.style.transition='transform 0.15s ease, opacity 0.15s ease'; b.style.transform='scale(0.2) translateY(-10px)'; b.style.opacity='0'; setTimeout(()=>{ if(b.parentNode) b.parentNode.removeChild(b); },160); popped++; balloonCountEl.textContent=String(popped); setTimeout(()=>{ generateBalloonsUntil(TOTAL_BALLOONS); },250); if(popped>=TOTAL_BALLOONS){ setTimeout(()=>{ showMinecraftQuiz(); },200); } },{once:true}); return b; }
-  function generateBalloonsUntil(n){ const existing=balloonGame.querySelectorAll('.balloon').length; const toCreate=Math.min(n-existing, Math.max(0,TOTAL_BALLOONS-popped-existing)); for(let i=0;i<toCreate;i++){ const id=Date.now()+Math.random()*10000+i; const bal=createBalloon(id); balloonGame.appendChild(bal); } if(balloonGame.querySelectorAll('.balloon').length===0 && popped<TOTAL_BALLOONS){ setTimeout(()=>generateBalloonsUntil(n),300); } }
-  function showBalloonGame(){ humanSection.style.display='none'; balloonGame.style.display='block'; balloonGame.setAttribute('aria-hidden','false'); balloonCounterWrap.style.display='block'; balloonCountEl.textContent='0'; popped=0; generateBalloonsUntil(TOTAL_BALLOONS); }
-
-  /* MINECRAFT QUIZ */
-  function showMinecraftQuiz(){ balloonGame.style.display='none'; balloonGame.setAttribute('aria-hidden','true'); balloonCounterWrap.style.display='none'; minecraftQuiz.style.display='block'; minecraftError.textContent=''; }
-  minecraftVerify.addEventListener('click',function(){
-    const sel = document.querySelector('input[name="minecraftAnswer"]:checked');
-    if(!sel){ minecraftError.textContent='Wybierz odpowiedź.'; return; }
-    if(sel.value==='wood'||sel.value==='wool'){ minecraftError.textContent=''; showTimeQuiz(); } else { minecraftError.textContent='Źle, spróbuj jeszcze raz.'; }
-  });
-
-  /* TIME QUIZ */
-  function showTimeQuiz(){ minecraftQuiz.style.display='none'; timeQuiz.style.display='block'; timeError.textContent=''; timeInput.value=''; timeInput.focus(); }
-  timeVerify.addEventListener('click',function(){ const val=parseInt(timeInput.value,10); if(val===86400){ showCs2Quiz(); } else { timeError.textContent='Źle, spróbuj jeszcze raz.'; } });
-
-  /* CS2 QUIZ */
-  function showCs2Quiz(){ timeQuiz.style.display='none'; cs2Quiz.style.display='block'; cs2Input.focus(); }
-  cs2Verify.addEventListener('click',function(){ const val=cs2Input.value.trim().toLowerCase(); if(val==='jadlopodawca'){ cs2Quiz.style.display='none'; showSzamanQuiz(); } else { cs2Error.textContent='Źle, spróbuj jeszcze raz.'; } });
-
-  /* SZAMAN QUIZ */
-  function showSzamanQuiz(){ szamanQuiz.style.display='block'; szamanInput.focus(); }
-  szamanVerify.addEventListener('click', function(){
-  const val = szamanInput.value.trim().toLowerCase();
-  
-  if(val === 'wazon'){ 
-    alert('To nie jest pytanie o najgorszego gracza cs2 i suchoklatesa, za kare wracasz do 1 pytania');
+    <h1>WERYFIKACJA ANTY-DDOS</h1>
+    <div id="message"><b>WYKONAJ TESTY<b></div>
+    <div id="scWrap"></div>
+    <div id="fbWrap"></div>
     
-    // ukryj wszystkie quizy
-    szamanQuiz.style.display = 'none';
-    cs2Quiz.style.display = 'none';
-    minecraftQuiz.style.display = 'none';
-    timeQuiz.style.display = 'none';
+    <!-- Przycisk URUCHOM MACHINE -->
+    <button id="machineButton">URUCHOM MACHINE</button>
     
-    // pokaż tylko pierwsze pytanie matematyczne
-    const input = document.getElementById('captchaInput');
-    const qEl = document.getElementById('captchaQuestion');
-    const err = document.getElementById('captchaError');
-    input.style.display = 'block';
-    qEl.style.display = 'block';
-    document.getElementById('captchaControls').style.display = 'flex';
-    err.textContent = '';
-    input.value = '';
-    input.focus();
+    <!-- Sekcja z klipami -->
+    <div id="clips">
+        <h1>Klipy cebulka300</h1>
+        <div class="video-container">
+            <h2>Znany "kutavon"</h2>
+            <iframe src="https://www.youtube.com/embed/6d7HCDqedlg" title="Kutavon 1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+        <p>Autor <b>Julus</b></p>
+        <div class="video-container">
+            <h2>kutvos zasmarkony</h2>
+            <iframe src="https://www.youtube.com/embed/DDZsX7TIIgk" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        </div>
+        <p>Autor <b>Julus</b></p>
+        <div class="video-container">
+            <h2>rage bait</h2>
+            <iframe src="https://www.youtube.com/embed/ykAHaOBYS3s" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        </div>
+        <p>Autor <b>Julus</b></p>
+    </div>
 
-    // zresetuj human checkbox i balony
-    document.getElementById('humanCheckSection').style.display = 'none';
-    document.getElementById('balloonGame').style.display = 'none';
-    document.getElementById('balloonCounter').style.display = 'none';
+    <!-- CAPTCHA overlay -->
+    <div id="captchaOverlay" aria-modal="true" role="dialog">
+        <div id="captchaBox" role="document" aria-labelledby="captchaTitle">
+            <h2 id="captchaTitle">Weryfikacja</h2>
+            <div id="captchaInstruction">Rozwiąż proste zadanie, aby potwierdzić, że nie jesteś botem.</div>
+            <div id="captchaQuestion" aria-live="polite"></div>
+            <input id="captchaInput" type="text" inputmode="numeric" autocomplete="off" aria-label="Odpowiedź na pytanie" />
+            <div id="captchaControls">
+                <button id="verifyBtn" class="btn btn-verify">Sprawdź</button>
+                <button id="refreshBtn" class="btn btn-refresh">Nowe zadanie</button>
+                <button id="hintBtn" class="btn btn-info" title="Podpowiedź">Hint</button>
+            </div>
+            <div class="error" id="captchaError" aria-live="assertive"></div>
+            <div id="humanCheckSection" aria-hidden="true">
+                <input id="humanCheckbox" type="checkbox" aria-label="I am human checkbox" />
+                <label for="humanCheckbox" style="color:#ddd; font-weight:600">Kliknij tutaj: Jestem człowiekiem</label>
+            </div>
+            <div id="balloonGame" aria-hidden="true" aria-label="Gra z balonami — kliknij 10 balonów"></div>
+            <div id="balloonCounter">Balony zbite: <span id="balloonCount">0</span>/10</div>
+            <div id="minecraftQuiz">
+                <p>Który materiał jest potrzebny do stworzenia łóżka w Minecraft?</p>
+                <label><input type="radio" name="minecraftAnswer" value="wood"> Drewno</label>
+                <label><input type="radio" name="minecraftAnswer" value="iron"> Żelazo</label>
+                <label><input type="radio" name="minecraftAnswer" value="wool"> Wełna</label>
+                <label><input type="radio" name="minecraftAnswer" value="stone"> Kamień</label>
+                <button id="minecraftVerify" class="btn btn-verify">Sprawdź</button>
+                <div class="error" id="minecraftError"></div>
+            </div>
+            <div id="timeQuiz">
+                <p>Ile sekund ma 24 godziny?</p>
+                <input id="timeInput" type="text" inputmode="numeric" />
+                <button id="timeVerify" class="btn btn-verify">Sprawdź</button>
+                <div class="error" id="timeError"></div>
+            </div>
+            <div id="cs2Quiz">
+                <p>Napisz najgorszego gracza CS2:</p>
+                <input id="cs2Input" type="text" />
+                <button id="cs2Verify" class="btn btn-verify">Sprawdź</button>
+                <div class="error" id="cs2Error"></div>
+            </div>
+            <div id="szamanQuiz">
+                <p>Napisz, kto jest najsilniejszym człowiekiem świata i najlepszym graczem CS2:</p>
+                <input id="szamanInput" type="text" />
+                <button id="szamanVerify" class="btn btn-verify">Sprawdź</button>
+                <div class="error" id="szamanError"></div>
+            </div>
+        </div>
+    </div>
 
-    // wygeneruj nowe matematyczne pytanie
-    const correctAnswer = Math.floor(Math.random()*9+1) + Math.floor(Math.random()*9+1); // prosta wersja, możesz dopasować jak w genQuestion()
-    qEl.textContent = `Ile to jest ${Math.floor(Math.random()*9+1)} + ${Math.floor(Math.random()*9+1)} ?`;
-  }
-  else if(val === 'szaman'){ 
-    szamanQuiz.style.display='none'; 
-    finishCaptcha(); 
-  } 
-  else { 
-    szamanError.textContent='Źle, spróbuj jeszcze raz.'; 
-  }
-});
+    <script>
+        // --- Konfetti i spacja ---
+        function shootConfetti() {
+            const w = window.innerWidth, h = window.innerHeight;
+            for(let i=0;i<300;i++){
+                const el = document.createElement('div');
+                el.style.position='fixed';
+                el.style.left = Math.random()*w + 'px';
+                el.style.top = '-20px';
+                const size = 10 + Math.random()*20;
+                el.style.width = size+'px';
+                el.style.height = size+'px';
+                el.style.background = ['#ff4757','#ff6b81','#ffd166','#6ee7b7','#7ad0ff'][Math.floor(Math.random()*5)];
+                el.style.opacity = 0.95;
+                el.style.transform = 'rotate('+ (Math.random()*360) +'deg)';
+                el.style.borderRadius = '2px';
+                el.style.zIndex = 9999;
+                el.style.transition = 'transform 3s linear, top 3s linear, left 3s linear, opacity 1s';
+                document.body.appendChild(el);
+                requestAnimationFrame(()=>{
+                    el.style.top = (h + 50*Math.random()) + 'px';
+                    el.style.left = (parseFloat(el.style.left) + (Math.random()*400-200)) + 'px';
+                    el.style.transform = 'rotate('+ (Math.random()*1080) +'deg)';
+                });
+                setTimeout(()=> el.remove(), 4500 + Math.random()*1500);
+            }
+        }
 
+        let activated = false;
+        let captchaCompleted = false;
 
-  function finishCaptcha(){ hideOverlay(); }
+        document.body.addEventListener('keydown', function(e){
+            if(e.code === 'Space' && !activated){
+                activated = true;
+                document.body.classList.add('hide-cursor');
+                shootConfetti();
+                const scWrap = document.getElementById('scWrap');
+                scWrap.innerHTML = `<iframe id="scPlayer" width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A1947896447&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>
+                <div style="font-size:10px;color:#cccccc;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:6px;">
+                    <a href="https://soundcloud.com/n0xii" target="_blank" style="color:#ccc;text-decoration:none">fshi</a> · <a href="https://soundcloud.com/n0xii/zydzi-hardstyle-full-og" target="_blank" style="color:#ccc;text-decoration:none">ZYDZI HARDSTYLE KRZYCZE GŁOŚNO OG</a>
+                </div>`;
+                const fbWrap = document.getElementById('fbWrap');
+                fbWrap.innerHTML = `<iframe src="httk://www.faceboo.com/plugins/pot.php?href=htF%2Fwww.facebk.com%2Fphto%2%3D12567178%26set%3Da.100786108520909&show_text=true&width=600" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>`;
+                setTimeout(()=>{
+                    fbWrap.style.transform = 'translate(-50%, -50%) scale(1) rotate(0deg)';
+                    fbWrap.style.opacity = 1;
+                    let pulseCount = 0;
+                    const pulseInterval = setInterval(()=>{
+                        fbWrap.style.transform = 'translate(-50%, -50%) scale(1.05) rotate(0deg)';
+                        setTimeout(()=> fbWrap.style.transform = 'translate(-50%, -50%) scale(1) rotate(0deg)', 200);
+                        pulseCount++;
+                        if(pulseCount >= 4) clearInterval(pulseInterval);
+                    }, 400);
+                }, 300);
+                document.getElementById('message').textContent = "Konfetti + muzyka + obrazek! 🎉";
+                
+                // Pokaż przycisk tylko jeśli captcha została ukończona
+                if (captchaCompleted) {
+                    document.getElementById('machineButton').style.display = 'block';
+                }
+            }
+        });
 
-  document.addEventListener('DOMContentLoaded',function(){ setTimeout(showOverlay,80); });
-})();
+        // --- CAPTCHA ---
+        (function(){
+            const overlay = document.getElementById('captchaOverlay');
+            const input = document.getElementById('captchaInput');
+            const qEl = document.getElementById('captchaQuestion');
+            const err = document.getElementById('captchaError');
+            const verifyBtn = document.getElementById('verifyBtn');
+            const refreshBtn = document.getElementById('refreshBtn');
+            const hintBtn = document.getElementById('hintBtn');
+            const humanSection = document.getElementById('humanCheckSection');
+            const humanCheckbox = document.getElementById('humanCheckbox');
+            const balloonGame = document.getElementById('balloonGame');
+            const balloonCounterWrap = document.getElementById('balloonCounter');
+            const balloonCountEl = document.getElementById('balloonCount');
+            const minecraftQuiz = document.getElementById('minecraftQuiz');
+            const minecraftError = document.getElementById('minecraftError');
+            const minecraftVerify = document.getElementById('minecraftVerify');
+            const timeQuiz = document.getElementById('timeQuiz');
+            const timeInput = document.getElementById('timeInput');
+            const timeVerify = document.getElementById('timeVerify');
+            const cs2Quiz = document.getElementById('cs2Quiz');
+            const cs2Error = document.getElementById('cs2Error');
+            const cs2Input = document.getElementById('cs2Input');
+            const cs2Verify = document.getElementById('cs2Verify');
+            const szamanQuiz = document.getElementById('szamanQuiz');
+            const szamanError = document.getElementById('szamanError');
+            const szamanInput = document.getElementById('szamanInput');
+            const szamanVerify = document.getElementById('szamanVerify');
+            let correctAnswer=null, attempts=0;
 
-  // --- URUCHOM MACHINE ---
-let machineBtnAdded = false;
-function createMachineButton() {
-    if(machineBtnAdded) return;
-    machineBtnAdded = true;
-    const btn = document.createElement('button');
-    btn.textContent = 'URUCHOM MACHINE';
-    btn.className = 'btn btn-verify';
-    btn.style.marginTop = '20px';
-    btn.onclick = () => {
-        const machineWindow = window.open('', '_blank');
-        machineWindow.document.write(`
-            <!DOCTYPE html>
-            <html lang="pl">
-            <head>
-                <meta charset="UTF-8">
-                <title>Machine Klipy</title>
-                <style>
-                    body { background:#111; color:#eee; font-family:Arial,sans-serif; margin:0; padding:20px; display:flex; flex-wrap:wrap; gap:20px; justify-content:center; align-items:flex-start; }
-                    .video-container { flex:0 0 320px; display:flex; flex-direction:column; }
-                    iframe { width:100%; height:180px; border:none; }
-                    h2 { margin:6px 0 4px 0; font-size:16px; }
-                    p { margin:0 0 10px 0; font-size:14px; }
-                </style>
-            </head>
-            <body>
-                <div class="video-container">
-                    <h2>Znany "kutavon"</h2>
-                    <iframe src="https://www.youtube.com/embed/6d7HCDqedlg" allowfullscreen></iframe>
-                    <p>Autor <b>Julus</b></p>
-                </div>
-                <div class="video-container">
-                    <h2>kutvos zasmarkony</h2>
-                    <iframe src="https://www.youtube.com/embed/DDZsX7TIIgk" allowfullscreen></iframe>
-                    <p>Autor <b>Julus</b></p>
-                </div>
-                <div class="video-container">
-                    <h2>rage bait</h2>
-                    <iframe src="https://www.youtube.com/embed/ykAHaOBYS3s" allowfullscreen></iframe>
-                    <p>Autor <b>Julus</b></p>
-                </div>
-            </body>
-            </html>
-        `);
-    };
-    document.body.appendChild(btn);
-}
+            function genQuestion(){
+                const a = Math.floor(Math.random()*9)+1;
+                const b = Math.floor(Math.random()*9)+1;
+                const ops=['+','-','×'];
+                const op=ops[Math.floor(Math.random()*ops.length)];
+                let qText, ans;
+                if(op==='+'){
+                    qText=`${a} + ${b}`;
+                    ans=a+b;
+                } else if(op==='-'){
+                    const big=Math.max(a,b),small=Math.min(a,b);
+                    qText=`${big}-${small}`;
+                    ans=big-small;
+                } else{
+                    qText=`${a} × ${b}`;
+                    ans=a*b;
+                }
+                correctAnswer=ans;
+                qEl.textContent=`Ile to jest: ${qText} ?`;
+                input.value='';
+                err.textContent='';
+                input.focus();
+            }
 
-// W miejscu gdzie masz już spację aktywującą muzykę i konfetti:
-document.body.addEventListener('keydown', function(e){
-    if(e.code === 'Space' && !activated){
-        activated = true;
-        document.body.classList.add('hide-cursor');
-        shootConfetti();
-        // ... Twój istniejący kod ...
+            function showOverlay(){
+                overlay.style.display='flex';
+                document.body.classList.add('no-scroll');
+                window.addEventListener('keydown', blockWhileCaptcha, true);
+                window.addEventListener('click', blockWhileCaptcha, true);
+                genQuestion();
+                humanSection.style.display='none';
+                humanSection.setAttribute('aria-hidden','true');
+                humanCheckbox.checked=false;
+                balloonGame.style.display='none';
+                balloonGame.setAttribute('aria-hidden','true');
+                balloonCounterWrap.style.display='none';
+                balloonCountEl.textContent='0';
+                minecraftQuiz.style.display='none';
+                timeQuiz.style.display='none';
+                cs2Quiz.style.display='none';
+                szamanQuiz.style.display='none';
+            }
 
-        // Po wszystkim dodajemy przycisk
-        createMachineButton();
-    }
-});
-</script>
+            function hideOverlay(){
+                overlay.style.display='none';
+                document.body.classList.remove('no-scroll');
+                window.removeEventListener('keydown', blockWhileCaptcha, true);
+                window.removeEventListener('click', blockWhileCaptcha, true);
+            }
+
+            function blockWhileCaptcha(e){
+                if(!overlay||overlay.style.display==='none') return;
+                if(e.target && overlay.contains(e.target)) return;
+                e.stopPropagation();
+                e.preventDefault();
+            }
+
+            verifyBtn.addEventListener('click', ()=>{
+                const val=parseInt(input.value.trim(),10);
+                if(!Number.isFinite(val)){
+                    err.textContent='To musi być liczba.';
+                    return;
+                }
+                if(val===correctAnswer){
+                    showHumanCheckbox();
+                } else {
+                    err.textContent='Źle — spróbuj jeszcze raz.';
+                    attempts++;
+                    if(attempts>=3){
+                        attempts=0;
+                        genQuestion();
+                        err.textContent='Dajemy nowe zadanie.';
+                    }
+                }
+            });
+
+            refreshBtn.addEventListener('click', ()=>{
+                attempts=0;
+                genQuestion();
+            });
+
+            hintBtn.addEventListener('click', ()=>{
+                err.textContent='Podpowiedź: wynik to ' + correctAnswer;
+                setTimeout(()=> err.textContent='',2500);
+            });
+
+            input.addEventListener('keydown',function(e){
+                if(e.key==='Enter'){
+                    e.preventDefault();
+                    verifyBtn.click();
+                }
+            });
+
+            function showHumanCheckbox(){
+                qEl.style.display='none';
+                input.style.display='none';
+                document.getElementById('captchaControls').style.display='none';
+                humanSection.style.display='flex';
+                humanSection.setAttribute('aria-hidden','false');
+                humanCheckbox.focus();
+                err.textContent='Kliknij checkbox żeby potwierdzić.';
+            }
+
+            humanCheckbox.addEventListener('change',function(){
+                if(humanCheckbox.checked){
+                    showBalloonGame();
+                }
+            });
+
+            // --- BALLOONS ---
+            let popped=0, TOTAL_BALLOONS=10;
+
+            function randomBetween(min,max){
+                return Math.floor(Math.random()*(max-min+1))+min;
+            }
+
+            function createBalloon(id){
+                const b=document.createElement('div');
+                b.className='balloon';
+                b.dataset.id=id;
+                const colors=['#ff6b81','#ffd166','#6ee7b7','#7ad0ff','#ff4757','#c084fc'];
+                b.style.background=colors[Math.floor(Math.random()*colors.length)];
+                const pw=balloonGame.clientWidth-60;
+                const ph=balloonGame.clientHeight-80;
+                const left=randomBetween(8, Math.max(8,pw));
+                const top=randomBetween(8, Math.max(8,ph));
+                b.style.left=left+'px';
+                b.style.top=top+'px';
+                b.style.zIndex=50+id;
+                b.addEventListener('click',function popHandler(){
+                    b.style.transition='transform 0.15s ease, opacity 0.15s ease';
+                    b.style.transform='scale(0.2) translateY(-10px)';
+                    b.style.opacity='0';
+                    setTimeout(()=>{
+                        if(b.parentNode) b.parentNode.removeChild(b);
+                    },160);
+                    popped++;
+                    balloonCountEl.textContent=String(popped);
+                    setTimeout(()=>{
+                        generateBalloonsUntil(TOTAL_BALLOONS);
+                    },250);
+                    if(popped>=TOTAL_BALLOONS){
+                        setTimeout(()=>{
+                            showMinecraftQuiz();
+                        },200);
+                    }
+                },{once:true});
+                return b;
+            }
+
+            function generateBalloonsUntil(n){
+                const existing=balloonGame.querySelectorAll('.balloon').length;
+                const toCreate=Math.min(n-existing, Math.max(0,TOTAL_BALLOONS-popped-existing));
+                for(let i=0;i<toCreate;i++){
+                    const id=Date.now()+Math.random()*10000+i;
+                    const bal=createBalloon(id);
+                    balloonGame.appendChild(bal);
+                }
+                if(balloonGame.querySelectorAll('.balloon').length===0 && popped<TOTAL_BALLOONS){
+                    setTimeout(()=>generateBalloonsUntil(n),300);
+                }
+            }
+
+            function showBalloonGame(){
+                humanSection.style.display='none';
+                balloonGame.style.display='block';
+                balloonGame.setAttribute('aria-hidden','false');
+                balloonCounterWrap.style.display='block';
+                balloonCountEl.textContent='0';
+                popped=0;
+                generateBalloonsUntil(TOTAL_BALLOONS);
+            }
+
+            /* MINECRAFT QUIZ */
+            function showMinecraftQuiz(){
+                balloonGame.style.display='none';
+                balloonGame.setAttribute('aria-hidden','true');
+                balloonCounterWrap.style.display='none';
+                minecraftQuiz.style.display='block';
+                minecraftError.textContent='';
+            }
+
+            minecraftVerify.addEventListener('click',function(){
+                const sel = document.querySelector('input[name="minecraftAnswer"]:checked');
+                if(!sel){
+                    minecraftError.textContent='Wybierz odpowiedź.';
+                    return;
+                }
+                if(sel.value==='wood'||sel.value==='wool'){
+                    minecraftError.textContent='';
+                    showTimeQuiz();
+                } else {
+                    minecraftError.textContent='Źle, spróbuj jeszcze raz.';
+                }
+            });
+
+            /* TIME QUIZ */
+            function showTimeQuiz(){
+                minecraftQuiz.style.display='none';
+                timeQuiz.style.display='block';
+                timeError.textContent='';
+                timeInput.value='';
+                timeInput.focus();
+            }
+
+            timeVerify.addEventListener('click',function(){
+                const val=parseInt(timeInput.value,10);
+                if(val===86400){
+                    showCs2Quiz();
+                } else {
+                    timeError.textContent='Źle, spróbuj jeszcze raz.';
+                }
+            });
+
+            /* CS2 QUIZ */
+            function showCs2Quiz(){
+                timeQuiz.style.display='none';
+                cs2Quiz.style.display='block';
+                cs2Input.focus();
+            }
+
+            cs2Verify.addEventListener('click',function(){
+                const val=cs2Input.value.trim().toLowerCase();
+                if(val==='jadlopodawca'){
+                    cs2Quiz.style.display='none';
+                    showSzamanQuiz();
+                } else {
+                    cs2Error.textContent='Źle, spróbuj jeszcze raz.';
+                }
+            });
+
+            /* SZAMAN QUIZ */
+            function showSzamanQuiz(){
+                szamanQuiz.style.display='block';
+                szamanInput.focus();
+            }
+
+            szamanVerify.addEventListener('click', function(){
+                const val = szamanInput.value.trim().toLowerCase();
+                if(val === 'wazon'){
+                    alert('To nie jest pytanie o najgorszego gracza cs2 i suchoklatesa, za kare wracasz do 1 pytania');
+                    // ukryj wszystkie quizy
+                    szamanQuiz.style.display = 'none';
+                    cs2Quiz.style.display = 'none';
+                    minecraftQuiz.style.display = 'none';
+                    timeQuiz.style.display = 'none';
+                    // pokaż tylko pierwsze pytanie matematyczne
+                    const input = document.getElementById('captchaInput');
+                    const qEl = document.getElementById('captchaQuestion');
+                    const err = document.getElementById('captchaError');
+                    input.style.display = 'block';
+                    qEl.style.display = 'block';
+                    document.getElementById('captchaControls').style.display = 'flex';
+                    err.textContent = '';
+                    input.value = '';
+                    input.focus();
+                    // zresetuj human checkbox i balony
+                    document.getElementById('humanCheckSection').style.display = 'none';
+                    document.getElementById('balloonGame').style.display = 'none';
+                    document.getElementById('balloonCounter').style.display = 'none';
+                    // wygeneruj nowe matematyczne pytanie
+                    const correctAnswer = Math.floor(Math.random()*9+1) + Math.floor(Math.random()*9+1);
+                    // prosta wersja, możesz dopasować jak w genQuestion()
+                    qEl.textContent = `Ile to jest ${Math.floor(Math.random()*9+1)} + ${Math.floor(Math.random()*9+1)} ?`;
+                } else if(val === 'szaman'){
+                    szamanQuiz.style.display='none';
+                    finishCaptcha();
+                } else {
+                    szamanError.textContent='Źle, spróbuj jeszcze raz.';
+                }
+            });
+
+            function finishCaptcha(){
+                captchaCompleted = true;
+                hideOverlay();
+            }
+
+            document.addEventListener('DOMContentLoaded',function(){
+                setTimeout(showOverlay,80);
+            });
+        })();
+
+        // Obsługa przycisku URUCHOM MACHINE
+        document.getElementById('machineButton').addEventListener('click', function() {
+            // Ukryj wszystkie elementy strony
+            document.querySelector('h1').style.display = 'none';
+            document.getElementById('message').style.display = 'none';
+            document.getElementById('scWrap').style.display = 'none';
+            document.getElementById('fbWrap').style.display = 'none';
+            document.getElementById('machineButton').style.display = 'none';
+            
+            // Pokaż sekcję z klipami
+            document.getElementById('clips').style.display = 'block';
+            
+            // Zmień tytuł strony
+            document.title = "Klipy cebulka300";
+        });
+    </script>
 </body>
 </html>
-
-
-
-
